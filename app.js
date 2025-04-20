@@ -38,6 +38,8 @@ fetch('questions.json')
       let score = 0;
       questions.forEach((q, i) => {
         score += parseInt(document.getElementById(`q${i}`).value);
+        document.getElementById('print').classList.remove('hidden');
+document.getElementById('print').onclick = () => window.print();
       });
       
       const percent = Math.round((score / (questions.length * 3)) * 100);
