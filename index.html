@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Ecosystem Scorecard</title>
+  <title>Ecosystem Assessment Tool</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -11,17 +11,20 @@
     <div id="progress-bar"><div id="progress"></div></div>
     <div id="question-container"></div>
     <button id="submit">Get Score</button>
-    <button id="print" class="hidden">Print Scorecard</button>
+    
     <div id="result" class="hidden">
       <h2>Your Score: <span id="score">0</span>/100</h2>
       <div id="feedback"></div>
-      <p id="last-score" class="small"></p>
-      <div id="survey-container">
-  <h3>Biodiversity Follow-up Survey</h3>
-  <div id="survey-questions"></div>
-  <button id="save-survey">Save Survey</button>
+      <button id="start-survey" class="hidden">Conduct Biodiversity Survey</button>
+      <div id="survey-container" class="hidden">
+        <h3>Biodiversity Survey</h3>
+        <div id="survey-questions"></div>
+        <button id="save-survey">Save Survey</button>
       </div>
+      <p id="last-score" class="small"></p>
     </div>
+    
+    <button id="print" class="hidden">Print Report</button>
   </div>
   <script src="app.js"></script>
 </body>
