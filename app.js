@@ -12,10 +12,21 @@ async function checkFiles() {
 }
 checkFiles();
 
+// Load previous score if exists
+function loadPreviousScore() {
+  const lastResult = localStorage.getItem('lastEcoScore');
+  if (lastResult) {
+    const { score, date } = JSON.parse(lastResult);
+    document.getElementById('last-score').textContent = 
+      `Last assessment: ${score}/100 on ${date}`;
+  }
+}
+
 // Load questions from JSON
 fetch('questions.json')
   .then(response => response.json())
   .then(data => {
+    loadPreviousScore();
     const questions = data.questions;
     const container = document.getElementById('question-container');
     
@@ -33,32 +44,50 @@ fetch('questions.json')
       `;
     });
 
+    // Progress tracker
+    container.addEventListener('change', () => {
+      const answered = document.querySelectorAll('select:not([value="2"])').length;
+      document.getElementById('progress').style.width = 
+        `${(answered / questions.length) * 100}%`;
+    });
+
     // Calculate score
     document.getElementById('submit').addEventListener('click', () => {
       let score = 0;
-      questions.forEach((q, i) => {
+      questions.forEach((_, i) => {
         score += parseInt(document.getElementById(`q${i}`).value);
       });
       
-      // Show print button AFTER score calculation
-      document.getElementById('print').classList.remove('hidden');
-      document.getElementById('print').onclick = () => window.print();
-      
       const percent = Math.round((score / (questions.length * 3)) * 100);
-      document.getElementById('score').textContent = percent;
+      const scoreElement = document.getElementById('score');
+      scoreElement.textContent = percent;
+      scoreElement.className = 
+        percent < 40 ? 'low' : 
+        percent < 70 ? 'medium' : 'high';
       
-      // Simple feedback (with safe recommendations fallback)
+      // Feedback
       const feedback = document.getElementById('feedback');
       feedback.innerHTML = percent > 70 ? 
         "✅ Healthy ecosystem! Maintain current practices." :
-        "⚠️ Needs improvement. Consider these actions:<br>- " + 
+        "⚠️ Needs improvement. Consider:<br>- " + 
         (data.recommendations?.join("<br>- ") || "No recommendations available");
       
+      // Show results
       document.getElementById('result').classList.remove('hidden');
+      document.getElementById('print').classList.remove('hidden');
+      
+      // Save results
+      localStorage.setItem('lastEcoScore', JSON.stringify({
+        score: percent,
+        date: new Date().toLocaleDateString()
+      }));
     });
+
+    // Print handler
+    document.getElementById('print').onclick = () => window.print();
   })
   .catch(error => {
     console.error("Error loading questions:", error);
-    document.getElementById('question-container').innerHTML = 
-      "<p class='error'>⚠️ Failed to load assessment questions. Check console.</p>";
+    container.innerHTML = 
+      `<p class='error'>⚠️ Error loading questions. Check console.</p>`;
   });
