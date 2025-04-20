@@ -1,4 +1,4 @@
-// Debug helper - checks if files exist
+// Debug helper
 async function checkFiles() {
   const requiredFiles = ['questions.json', 'style.css'];
   for (const file of requiredFiles) {
@@ -6,24 +6,23 @@ async function checkFiles() {
       const response = await fetch(file);
       if (!response.ok) console.error(`🚨 Missing file: ${file}`);
     } catch (e) {
-      console.error(`🚨 Cannot load ${file} (check name/extension)`); 
+      console.error(`🚨 Cannot load ${file}`); 
     }
   }
 }
 checkFiles();
 
-// Load previous score if exists
+// Load previous score
 function loadPreviousScore() {
   const lastResult = localStorage.getItem('lastEcoScore');
   if (lastResult) {
-    const { score, date, biodiversitySurvey } = JSON.parse(lastResult);
+    const { score, date } = JSON.parse(lastResult);
     document.getElementById('last-score').textContent = 
       `Last assessment: ${score}/100 on ${date}`;
-    if (biodiversitySurvey) console.log('Previous survey data:', biodiversitySurvey);
   }
 }
 
-// Load questions from JSON
+// Main application
 fetch('questions.json')
   .then(response => response.json())
   .then(data => {
@@ -31,7 +30,7 @@ fetch('questions.json')
     const questions = data.questions;
     const container = document.getElementById('question-container');
     
-    // Display main questions
+    // Display questions
     questions.forEach((q, i) => {
       container.innerHTML += `
         <div class="question">
@@ -77,59 +76,62 @@ fetch('questions.json')
       document.getElementById('result').classList.remove('hidden');
       document.getElementById('print').classList.remove('hidden');
 
-      // Biodiversity survey (conditionally shown)
-      if (percent < 70 && data.biodiversitySurvey) {
-        const surveyContainer = document.getElementById('survey-container');
-        const surveyQuestions = document.getElementById('survey-questions');
-        surveyQuestions.innerHTML = '';
-        
-        data.biodiversitySurvey.forEach((q, i) => {
-          surveyQuestions.innerHTML += `
-            <div class="survey-question">
-              <label>${q.text}</label>
-              ${q.type === 'checkbox' ? 
-                `<input type="checkbox" id="survey-q${i}">` : 
-                `<input type="${q.type}" id="survey-q${i}">`
-              }
-            </div>
-          `;
-        });
-        
-        surveyContainer.style.display = 'block';
-        
-        document.getElementById('save-survey').onclick = () => {
-          const surveyData = data.biodiversitySurvey.map((q, i) => ({
-            question: q.text,
-            answer: document.getElementById(`survey-q${i}`)[q.type === 'checkbox' ? 'checked' : 'value']
-          }));
-          
-          // Update saved result
-          const saved = JSON.parse(localStorage.getItem('lastEcoScore') || '{}');
-          localStorage.setItem('lastEcoScore', JSON.stringify({
-            ...saved,
-            score: percent,
-            date: new Date().toLocaleDateString(),
-            biodiversitySurvey: surveyData
-          }));
-          
-          alert("Biodiversity data saved!");
-        };
+      // Optional biodiversity survey
+      if (data.recommendations?.includes("Conduct a biodiversity survey")) {
+        document.getElementById('start-survey').classList.remove('hidden');
       }
       
-      // Save basic results (without survey if not applicable)
-      if (!(percent < 70 && data.biodiversitySurvey)) {
-        localStorage.setItem('lastEcoScore', JSON.stringify({
-          score: percent,
-          date: new Date().toLocaleDateString()
+      // Save results
+      localStorage.setItem('lastEcoScore', JSON.stringify({
+        score: percent,
+        date: new Date().toLocaleDateString()
+      }));
+    });
+
+    // Biodiversity survey handler
+    document.getElementById('start-survey').addEventListener('click', () => {
+      const surveyQuestions = [
+        { text: "Estimated native plant species count", type: "number" },
+        { text: "Dominant species observed", type: "text" },
+        { text: "Rare species present", type: "checkbox" }
+      ];
+      
+      const container = document.getElementById('survey-questions');
+      container.innerHTML = surveyQuestions.map((q, i) => `
+        <div class="survey-question">
+          <label>${q.text}</label>
+          ${q.type === 'checkbox' ? 
+            `<input type="checkbox" id="survey-q${i}">` : 
+            `<input type="${q.type}" id="survey-q${i}">`
+          }
+        </div>
+      `).join('');
+      
+      document.getElementById('survey-container').classList.remove('hidden');
+      document.getElementById('start-survey').classList.add('hidden');
+      
+      // Save survey
+      document.getElementById('save-survey').addEventListener('click', () => {
+        const surveyData = surveyQuestions.map((q, i) => ({
+          question: q.text,
+          answer: document.getElementById(`survey-q${i}`)[q.type === 'checkbox' ? 'checked' : 'value']
         }));
-      }
+        
+        const saved = JSON.parse(localStorage.getItem('lastEcoScore') || '{}';
+        localStorage.setItem('lastEcoScore', JSON.stringify({
+          ...saved,
+          biodiversitySurvey: surveyData
+        }));
+        
+        alert("Survey data saved!");
+      });
     });
 
     // Print handler
     document.getElementById('print').onclick = () => window.print();
   })
   .catch(error => {
-    console.error("Error loading questions:", error);
+    console.error("Error:", error);
     document.getElementById('question-container').innerHTML = 
-      `<p class='error'>⚠️ Error loading questions. Check console.</p>`;
+      `<p class='error'>⚠️ Error loading assessment. Check console.</p>`;
   });
