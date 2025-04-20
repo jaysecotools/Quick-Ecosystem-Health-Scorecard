@@ -110,22 +110,21 @@ fetch('questions.json')
       document.getElementById('survey-container').classList.remove('hidden');
       document.getElementById('start-survey').classList.add('hidden');
       
-      // Save survey
-      document.getElementById('save-survey').addEventListener('click', () => {
-        const surveyData = surveyQuestions.map((q, i) => ({
-          question: q.text,
-          answer: document.getElementById(`survey-q${i}`)[q.type === 'checkbox' ? 'checked' : 'value']
-        }));
-        
-        const saved = JSON.parse(localStorage.getItem('lastEcoScore') || '{}';
-        localStorage.setItem('lastEcoScore', JSON.stringify({
-          ...saved,
-          biodiversitySurvey: surveyData
-        }));
-        
-        alert("Survey data saved!");
-      });
-    });
+// Save survey
+document.getElementById('save-survey').addEventListener('click', () => {
+  const surveyData = surveyQuestions.map((q, i) => ({
+    question: q.text,
+    answer: document.getElementById(`survey-q${i}`)[q.type === 'checkbox' ? 'checked' : 'value']
+  }));
+  
+  const saved = JSON.parse(localStorage.getItem('lastEcoScore') || '{}'); // Fixed this line
+  localStorage.setItem('lastEcoScore', JSON.stringify({
+    ...saved,
+    biodiversitySurvey: surveyData
+  }));
+  
+  alert("Survey data saved!");
+});
 
     // Print handler
     document.getElementById('print').onclick = () => window.print();
