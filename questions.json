@@ -7,9 +7,12 @@
     {"text": "Wildlife activity signs"}
   ],
   "recommendations": [
-    "Conduct a biodiversity survey",
     "Install erosion control measures",
-    "Remove invasive species gradually",
-    "Monitor water quality monthly"
+    "Remove invasive species gradually"
+  ],
+  "biodiversitySurvey": [
+    {"text": "Estimated native plant species count", "type": "number"},
+    {"text": "Dominant species observed", "type": "text"},
+    {"text": "Rare species present", "type": "checkbox"}
   ]
 }
