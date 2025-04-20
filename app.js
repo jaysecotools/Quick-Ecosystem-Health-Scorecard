@@ -38,20 +38,27 @@ fetch('questions.json')
       let score = 0;
       questions.forEach((q, i) => {
         score += parseInt(document.getElementById(`q${i}`).value);
-        document.getElementById('print').classList.remove('hidden');
-document.getElementById('print').onclick = () => window.print();
       });
+      
+      // Show print button AFTER score calculation
+      document.getElementById('print').classList.remove('hidden');
+      document.getElementById('print').onclick = () => window.print();
       
       const percent = Math.round((score / (questions.length * 3)) * 100);
       document.getElementById('score').textContent = percent;
       
-      // Simple feedback
+      // Simple feedback (with safe recommendations fallback)
       const feedback = document.getElementById('feedback');
       feedback.innerHTML = percent > 70 ? 
         "✅ Healthy ecosystem! Maintain current practices." :
         "⚠️ Needs improvement. Consider these actions:<br>- " + 
-        data.recommendations.join("<br>- ");
+        (data.recommendations?.join("<br>- ") || "No recommendations available");
       
       document.getElementById('result').classList.remove('hidden');
     });
+  })
+  .catch(error => {
+    console.error("Error loading questions:", error);
+    document.getElementById('question-container').innerHTML = 
+      "<p class='error'>⚠️ Failed to load assessment questions. Check console.</p>";
   });
