@@ -130,8 +130,18 @@ fetch('questions.json')
     // Print handler
     document.getElementById('print').onclick = () => window.print();
   })
-  .catch(error => {
-    console.error("Error:", error);
-    document.getElementById('question-container').innerHTML = 
-      `<p class='error'>⚠️ Error loading assessment. Check console.</p>`;
-  });
+// Replace the error handling at the bottom of app.js with this:
+.catch(error => {
+  console.error("Error:", error);
+  const container = document.getElementById('question-container') || document.body;
+  container.innerHTML = `
+    <div class="error">
+      ⚠️ Error loading questions. Please check:
+      <ol>
+        <li>All files are in the same folder</li>
+        <li>questions.json is valid (no trailing commas)</li>
+        <li>Browser console for details (F12 > Console)</li>
+      </ol>
+    </div>
+  `;
+});
