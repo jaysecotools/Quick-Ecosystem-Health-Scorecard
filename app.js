@@ -75,6 +75,46 @@ fetch('questions.json')
       // Show results
       document.getElementById('result').classList.remove('hidden');
       document.getElementById('print').classList.remove('hidden');
+
+      // After showing results (where score is calculated)
+if (percent < 70 && data.biodiversitySurvey) {
+  const surveyContainer = document.getElementById('survey-container');
+  const surveyQuestions = document.getElementById('survey-questions');
+  
+  // Build survey form
+  data.biodiversitySurvey.forEach((q, i) => {
+    surveyQuestions.innerHTML += `
+      <div class="survey-question">
+        <label>${q.text}</label>
+        ${q.type === 'checkbox' ? 
+          `<input type="checkbox" id="survey-q${i}">` : 
+          `<input type="${q.type}" id="survey-q${i}">`
+        }
+      </div>
+    `;
+  });
+  
+  surveyContainer.style.display = 'block';
+  
+  // Save survey handler
+  document.getElementById('save-survey').addEventListener('click', () => {
+    const surveyData = [];
+    data.biodiversitySurvey.forEach((q, i) => {
+      const element = document.getElementById(`survey-q${i}`);
+      surveyData.push({
+        question: q.text,
+        answer: q.type === 'checkbox' ? element.checked : element.value
+      });
+    });
+    
+    // Save with main assessment
+    const savedData = JSON.parse(localStorage.getItem('lastEcoScore') || {};
+    savedData.biodiversitySurvey = surveyData;
+    localStorage.setItem('lastEcoScore', JSON.stringify(savedData));
+    
+    alert("Survey saved! You can view it in your browser's developer tools (Local Storage)");
+  });
+}
       
       // Save results
       localStorage.setItem('lastEcoScore', JSON.stringify({
