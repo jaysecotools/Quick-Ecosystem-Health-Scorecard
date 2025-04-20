@@ -59,13 +59,19 @@ button:hover {
   background: #45a049;
 }
 
-/* Add to style.css */
+#start-survey {
+  background: #2196F3;
+}
+
+#save-survey {
+  background: #5cb85c;
+}
+
 #survey-container {
   margin-top: 20px;
   padding: 15px;
-  background: #f5f5f5;
+  background: #f0f8ff;
   border-radius: 5px;
-  display: none;
 }
 
 .survey-question {
@@ -74,8 +80,8 @@ button:hover {
 
 .survey-question label {
   display: block;
-  margin-bottom: 5px;
   font-weight: bold;
+  margin-bottom: 5px;
 }
 
 input[type="number"], 
@@ -86,13 +92,13 @@ input[type="text"] {
 }
 
 @media (max-width: 600px) {
-  select {
+  select, input {
     font-size: 16px;
     padding: 8px;
     width: 100%;
   }
   button {
-    padding: 10px 15px;
+    padding: 10px;
     width: 100%;
     margin: 8px 0;
   }
