@@ -1,3 +1,17 @@
+// Debug helper - checks if files exist
+async function checkFiles() {
+  const requiredFiles = ['questions.json', 'style.css'];
+  for (const file of requiredFiles) {
+    try {
+      const response = await fetch(file);
+      if (!response.ok) console.error(`🚨 Missing file: ${file}`);
+    } catch (e) {
+      console.error(`🚨 Cannot load ${file} (check name/extension)`); 
+    }
+  }
+}
+checkFiles();
+
 // Load questions from JSON
 fetch('questions.json')
   .then(response => response.json())
